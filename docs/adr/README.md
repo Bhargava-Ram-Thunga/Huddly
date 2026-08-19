@@ -1,0 +1,19 @@
+# Architecture Decision Records (ADRs)
+
+This directory documents the foundational architectural decisions for Huddly following the [MADR](https://adr.github.io/madr/) format.
+
+| ADR                                                   | Title                                                                   | Status   | Scope / Phase                       | Issue                                                          |
+| :---------------------------------------------------- | :---------------------------------------------------------------------- | :------- | :---------------------------------- | :------------------------------------------------------------- |
+| **[ADR-001](ADR-001-webrtc-voice.md)**                | WebRTC for Realtime Voice & Audio Streaming                             | Accepted | Voice / Phase 8 (`M7`)              | [#42](https://github.com/Bhargava-Ram-Thunga/Huddly/issues/42) |
+| **[ADR-002](ADR-002-sfu-topology.md)**                | Selective Forwarding Unit (SFU) vs. Mesh vs. MCU Topology               | Accepted | Voice / Phase 8 (`M7`)              | [#42](https://github.com/Bhargava-Ram-Thunga/Huddly/issues/42) |
+| **[ADR-003](ADR-003-livekit-sfu.md)**                 | LiveKit for WebRTC Media Plane Infrastructure                           | Accepted | Voice / Phase 8 (`M7`)              | [#42](https://github.com/Bhargava-Ram-Thunga/Huddly/issues/42) |
+| **[ADR-004](ADR-004-postgresql-relational-store.md)** | PostgreSQL 16 & Prisma ORM as Primary Relational Store                  | Accepted | Data / Phase 0 (`M0`)               | [#43](https://github.com/Bhargava-Ram-Thunga/Huddly/issues/43) |
+| **[ADR-005](ADR-005-redis-ephemeral-boundaries.md)**  | Redis Architectural Boundaries: Caching, Presence, and Pub/Sub          | Accepted | Data & State / Phase 0 (`M0`)       | [#43](https://github.com/Bhargava-Ram-Thunga/Huddly/issues/43) |
+| **[ADR-006](ADR-006-fastify-websocket-gateway.md)**   | Fastify WebSocket Control Plane and Connection Gating                   | Accepted | Realtime / Phase 0 (`M0`)           | [#43](https://github.com/Bhargava-Ram-Thunga/Huddly/issues/43) |
+| **[ADR-007](ADR-007-typescript-zod-contracts.md)**    | Strict TypeScript & Shared Zod Contract Validation                      | Accepted | Tooling & Protocol / Phase 0 (`M0`) | [#44](https://github.com/Bhargava-Ram-Thunga/Huddly/issues/44) |
+| **[ADR-008](ADR-008-modular-monolith.md)**            | Modular Monolith Architecture with Domain-Driven Package Boundaries     | Accepted | Architecture / Phase 0 (`M0`)       | [#44](https://github.com/Bhargava-Ram-Thunga/Huddly/issues/44) |
+| **[ADR-009](ADR-009-monorepo-pnpm-turborepo.md)**     | Monorepo Build Topology with pnpm Workspaces and Turborepo              | Accepted | Build & CI / Phase 0 (`M0`)         | [#44](https://github.com/Bhargava-Ram-Thunga/Huddly/issues/44) |
+| **[ADR-010](ADR-010-extension-architecture.md)**      | Extension architecture, runtime contexts, and HUD isolation             | Accepted | Extension / Phase 6 (`M5`)          | [#45](https://github.com/Bhargava-Ram-Thunga/Huddly/issues/45) |
+| **[ADR-011](ADR-011-sync-algorithm.md)**              | Continuous projection $P(t)$, clock estimation, and 4-tier drift ladder | Accepted | Sync Engine / Phase 5 (`M4`)        | [#45](https://github.com/Bhargava-Ram-Thunga/Huddly/issues/45) |
+| **[ADR-012](ADR-012-adapter-architecture.md)**        | Site adapter boundaries, mutation observers, and HTML5 video contracts  | Accepted | Adapters / Phase 6 (`M5`)           | [#45](https://github.com/Bhargava-Ram-Thunga/Huddly/issues/45) |
+| **[ADR-013](ADR-013-license.md)**                     | Open licensing strategy & Apache License 2.0 adoption                   | Accepted | Governance / Phase 0 (`M0`)         | [#51](https://github.com/Bhargava-Ram-Thunga/Huddly/issues/51) |

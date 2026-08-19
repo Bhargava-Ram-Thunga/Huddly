@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" width="1280" height="640" fill="none">
+  <defs>
+    <radialGradient id="bg-radial" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#1F2A42" />
+      <stop offset="60%" stop-color="#131A2A" />
+      <stop offset="100%" stop-color="#0B0F19" />
+    </radialGradient>
+    <filter id="mark-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#F2BB31" flood-opacity="0.2" />
+      <feDropShadow dx="0" dy="16" stdDeviation="24" flood-color="#000000" flood-opacity="0.5" />
+    </filter>
+    <linearGradient id="butter-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFE885" />
+      <stop offset="45%" stop-color="#F2BB31" />
+      <stop offset="100%" stop-color="#E5A61C" />
+    </linearGradient>
+    <linearGradient id="cream-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#FAF3E4" />
+    </linearGradient>
+    <linearGradient id="badge-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1B2438" />
+      <stop offset="100%" stop-color="#161E2E" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="1280" height="640" fill="url(#bg-radial)" />
+
+  <!-- Ambient Decorative Geometry -->
+  <circle cx="150" cy="120" r="180" fill="#F2BB31" opacity="0.03" filter="blur(40px)" />
+  <circle cx="1130" cy="500" r="220" fill="#D94543" opacity="0.03" filter="blur(50px)" />
+
+  <!-- Center Content Container -->
+  <g transform="translate(240, 140)">
+    <!-- Brand Mark (140x140) -->
+    <g transform="translate(0, 20) scale(1.15)" filter="url(#mark-glow)">
+      <!-- Kernel 1 (Top Left) -->
+      <g>
+        <circle cx="36" cy="30" r="15" fill="#BF7118" opacity="0.3" />
+        <circle cx="27" cy="22" r="11" fill="url(#butter-grad)" />
+        <circle cx="45" cy="21" r="12" fill="url(#butter-grad)" />
+        <circle cx="47" cy="37" r="11" fill="url(#butter-grad)" />
+        <circle cx="28" cy="37" r="10" fill="url(#butter-grad)" />
+        <circle cx="37" cy="28" r="13" fill="url(#butter-grad)" />
+        <circle cx="26" cy="20" r="6" fill="url(#cream-grad)" opacity="0.9" />
+        <circle cx="44" cy="19" r="7" fill="url(#cream-grad)" opacity="0.9" />
+        <circle cx="37" cy="26" r="6.5" fill="url(#cream-grad)" opacity="0.95" />
+        <circle cx="36" cy="31" r="3.5" fill="#BF7118" />
+      </g>
+      <!-- Kernel 2 (Bottom Left) -->
+      <g>
+        <circle cx="36" cy="98" r="15" fill="#BF7118" opacity="0.3" />
+        <circle cx="27" cy="90" r="11" fill="url(#butter-grad)" />
+        <circle cx="45" cy="91" r="12" fill="url(#butter-grad)" />
+        <circle cx="47" cy="107" r="11" fill="url(#butter-grad)" />
+        <circle cx="28" cy="107" r="10" fill="url(#butter-grad)" />
+        <circle cx="37" cy="100" r="13" fill="url(#butter-grad)" />
+        <circle cx="26" cy="88" r="6" fill="url(#cream-grad)" opacity="0.9" />
+        <circle cx="44" cy="89" r="7" fill="url(#cream-grad)" opacity="0.9" />
+        <circle cx="37" cy="98" r="6.5" fill="url(#cream-grad)" opacity="0.95" />
+        <circle cx="36" cy="101" r="3.5" fill="#BF7118" />
+      </g>
+      <!-- Kernel 3 (Right Apex) -->
+      <g>
+        <circle cx="98" cy="64" r="15" fill="#BF7118" opacity="0.3" />
+        <circle cx="89" cy="55" r="11" fill="url(#butter-grad)" />
+        <circle cx="107" cy="57" r="12" fill="url(#butter-grad)" />
+        <circle cx="109" cy="73" r="11" fill="url(#butter-grad)" />
+        <circle cx="90" cy="73" r="10" fill="url(#butter-grad)" />
+        <circle cx="100" cy="64" r="13" fill="url(#butter-grad)" />
+        <circle cx="88" cy="53" r="6" fill="url(#cream-grad)" opacity="0.9" />
+        <circle cx="106" cy="55" r="7" fill="url(#cream-grad)" opacity="0.9" />
+        <circle cx="99" cy="62" r="6.5" fill="url(#cream-grad)" opacity="0.95" />
+        <circle cx="98" cy="65" r="3.5" fill="#BF7118" />
+      </g>
+    </g>
+
+    <!-- Wordmark "Huddly" -->
+    <text x="175" y="125" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="105" font-weight="850" letter-spacing="-0.035em" fill="#FAF3E4">
+      Huddly
+    </text>
+    <!-- Wordmark Accent Dot -->
+    <circle cx="562" cy="110" r="10" fill="#F2BB31" />
+
+    <!-- Tagline -->
+    <text x="0" y="245" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="34" font-weight="500" fill="#E5D7BF" letter-spacing="-0.01em">
+      Watch together. Talk together. Stay on your own screen.
+    </text>
+
+    <!-- Pill Badges -->
+    <g transform="translate(0, 285)">
+      <!-- Badge 1 -->
+      <rect x="0" y="0" width="168" height="42" rx="21" fill="url(#badge-grad)" stroke="#364563" stroke-width="1.5" />
+      <circle cx="22" cy="21" r="5" fill="#F2BB31" />
+      <text x="36" y="27" font-family="system-ui, sans-serif" font-size="16" font-weight="600" fill="#FAF3E4">Realtime Sync</text>
+
+      <!-- Badge 2 -->
+      <rect x="180" y="0" width="225" height="42" rx="21" fill="url(#badge-grad)" stroke="#364563" stroke-width="1.5" />
+      <circle cx="202" cy="21" r="5" fill="#4CAF50" />
+      <text x="216" y="27" font-family="system-ui, sans-serif" font-size="16" font-weight="600" fill="#FAF3E4">State Sync, Not Pixels</text>
+
+      <!-- Badge 3 -->
+      <rect x="417" y="0" width="195" height="42" rx="21" fill="url(#badge-grad)" stroke="#364563" stroke-width="1.5" />
+      <circle cx="439" cy="21" r="5" fill="#4DA1E8" />
+      <text x="453" y="27" font-family="system-ui, sans-serif" font-size="16" font-weight="600" fill="#FAF3E4">Web &amp; Extensions</text>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,114 @@
+/**
+ * Huddly Design Tokens — tokens.css
+ * OKLCH-derived popcorn brand palette and golden-angle participant colors.
+ */
+
+:root {
+  /* Brand Core Palette */
+  --color-butter: #f2bb31;
+  --color-caramel: #bf7118;
+  --color-boxred: #d94543;
+  --color-kernel: #4d3119;
+  --color-cream: #faf3e4;
+  --color-cinema: #131a2a;
+
+  /* OKLCH Core Values */
+  --oklch-butter: oklch(0.8 0.17 85);
+  --oklch-caramel: oklch(0.58 0.16 60);
+  --oklch-boxred: oklch(0.58 0.2 25);
+  --oklch-kernel: oklch(0.32 0.08 55);
+  --oklch-cream: oklch(0.96 0.02 85);
+  --oklch-cinema: oklch(0.2 0.04 260);
+
+  /* Light Theme Semantics (Default) */
+  --bg-primary: var(--color-cream);
+  --bg-secondary: #f3ebd8;
+  --bg-tertiary: #eadbbe;
+  --bg-overlay: rgba(19, 26, 42, 0.6);
+
+  --fg-primary: var(--color-cinema);
+  --fg-secondary: var(--color-kernel);
+  --fg-muted: #755e49;
+  --fg-inverse: var(--color-cream);
+
+  --border-subtle: #e5d7bf;
+  --border-default: #d1c0a5;
+  --border-focus: var(--color-caramel);
+
+  --status-success: #2e8540;
+  --status-warning: var(--color-caramel);
+  --status-error: var(--color-boxred);
+  --status-info: #1e70b8;
+
+  /* Participant Colors — Light Mode: oklch(0.74 0.155 <hue>) */
+  --participant-0: oklch(0.74 0.155 85);
+  --participant-1: oklch(0.74 0.155 222.51);
+  --participant-2: oklch(0.74 0.155 0.02);
+  --participant-3: oklch(0.74 0.155 137.52);
+  --participant-4: oklch(0.74 0.155 275.03);
+  --participant-5: oklch(0.74 0.155 52.54);
+  --participant-6: oklch(0.74 0.155 190.05);
+  --participant-7: oklch(0.74 0.155 327.55);
+  --participant-8: oklch(0.74 0.155 105.06);
+  --participant-9: oklch(0.74 0.155 242.57);
+
+  /* Spacing */
+  --space-0: 0px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* Typography */
+  --font-sans:
+    system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+[data-theme='dark'] {
+  /* Dark Theme Semantics */
+  --bg-primary: var(--color-cinema);
+  --bg-secondary: #1b2438;
+  --bg-tertiary: #24304a;
+  --bg-overlay: rgba(8, 11, 18, 0.75);
+
+  --fg-primary: var(--color-cream);
+  --fg-secondary: #e5d7bf;
+  --fg-muted: #96a4b8;
+  --fg-inverse: var(--color-cinema);
+
+  --border-subtle: #253147;
+  --border-default: #364563;
+  --border-focus: var(--color-butter);
+
+  --status-success: #4caf50;
+  --status-warning: var(--color-butter);
+  --status-error: var(--color-boxred);
+  --status-info: #4da1e8;
+
+  /* Participant Colors — Dark Mode: oklch(0.80 0.145 <hue>) */
+  --participant-0: oklch(0.8 0.145 85);
+  --participant-1: oklch(0.8 0.145 222.51);
+  --participant-2: oklch(0.8 0.145 0.02);
+  --participant-3: oklch(0.8 0.145 137.52);
+  --participant-4: oklch(0.8 0.145 275.03);
+  --participant-5: oklch(0.8 0.145 52.54);
+  --participant-6: oklch(0.8 0.145 190.05);
+  --participant-7: oklch(0.8 0.145 327.55);
+  --participant-8: oklch(0.8 0.145 105.06);
+  --participant-9: oklch(0.8 0.145 242.57);
+}

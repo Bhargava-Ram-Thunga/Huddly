@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "types": ["node"]
+  },
+  "references": [
+    { "path": "../../packages/protocol" },
+    { "path": "../../packages/config" },
+    { "path": "../../packages/sync-engine" },
+    { "path": "../../packages/database" }
+  ],
+  "include": ["src/**/*"],
+  "exclude": ["src/**/*.test.ts"]
+}

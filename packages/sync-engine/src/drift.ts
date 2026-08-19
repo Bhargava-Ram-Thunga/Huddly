@@ -124,7 +124,8 @@ export function decideCorrection(
   if (magnitude < thresholds.nudgeMs && state.playing) {
     // Ahead of the room → play slightly slower; behind → slightly faster.
     const direction = driftMs > 0 ? -1 : 1;
-    const correctedRate = state.playbackRate * (1 + direction * 0.05);
+    const rawRate = state.playbackRate * (1 + direction * 0.05);
+    const correctedRate = Math.min(4.0, Math.max(0.25, rawRate));
     return { driftMs, action: 'nudge-rate', correctedRate, seekTo: null };
   }
 

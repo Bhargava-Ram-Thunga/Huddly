@@ -38,6 +38,15 @@ updates:
         dependency-type: production
         patterns:
           - '*'
+    ignore:
+      - dependency-name: typescript
+        update-types: ['version-update:semver-major']
+      - dependency-name: prisma
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@prisma/client'
+        update-types: ['version-update:semver-major']
+      - dependency-name: ioredis
+        update-types: ['version-update:semver-major']
     labels:
       - type:infrastructure
       - area:devops

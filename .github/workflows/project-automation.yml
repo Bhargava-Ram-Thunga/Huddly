@@ -1,0 +1,156 @@
+name: Project automation
+
+# Keeps the "Huddly Roadmap" board in sync with real work events.
+# Scenario spec: docs/process/board-automation.md
+#
+# Requires repository secret PROJECT_TOKEN (classic PAT with repo + project
+# scopes). Every job skips with a warning when it is absent, so CI stays green.
+
+on:
+  issues:
+    types: [opened, reopened, closed, assigned, labeled, unlabeled]
+  pull_request_target:
+    types: [opened, reopened, ready_for_review, converted_to_draft, closed]
+  pull_request_review:
+    types: [submitted]
+  workflow_run:
+    workflows: [CD]
+    types: [completed]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: board-${{ github.event_name }}-${{ github.event.issue.number || github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  issues:
+    name: Issue events
+    if: github.event_name == 'issues'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Resolve target status
+        id: target
+        env:
+          ACTION: ${{ github.event.action }}
+          LABEL: ${{ github.event.label.name }}
+        run: |
+          status=""
+          case "$ACTION" in
+            opened)   status="Backlog" ;;                 # S1
+            reopened) status="Backlog" ;;                 # S10
+            closed)   status="Done" ;;                    # S9
+            assigned) status="In Progress" ;;             # S2
+            labeled)
+              case "$LABEL" in
+                status:needs-research|status:needs-design) status="Backlog" ;;
+                status:ready)       status="Backlog" ;;
+                status:in-progress) status="In Progress" ;;
+                status:in-review)   status="In Review" ;;
+                status:blocked)     status="In Progress" ;;
+              esac ;;
+            unlabeled)
+              [ "$LABEL" = "status:blocked" ] && status="In Progress" ;;
+          esac
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+      - name: Move card
+        if: steps.target.outputs.status != ''
+        env:
+          GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::warning::PROJECT_TOKEN not configured — skipping board update."
+            exit 0
+          fi
+          bash .github/scripts/board-sync.sh \
+            "${{ steps.target.outputs.status }}" \
+            "${{ github.event.issue.node_id }}"
+
+  pull_requests:
+    name: Pull request events
+    if: github.event_name == 'pull_request_target'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+      - name: Resolve target status
+        id: target
+        env:
+          ACTION: ${{ github.event.action }}
+          IS_DRAFT: ${{ github.event.pull_request.draft }}
+          MERGED: ${{ github.event.pull_request.merged }}
+          BASE: ${{ github.event.pull_request.base.ref }}
+        run: |
+          status=""
+          case "$ACTION" in
+            opened|reopened)
+              if [ "$IS_DRAFT" = "true" ]; then status="In Progress";   # S3
+              else status="In Review"; fi ;;                            # S4
+            ready_for_review)    status="In Review" ;;                  # S4
+            converted_to_draft)  status="In Progress" ;;                # S6
+            closed)
+              if [ "$MERGED" = "true" ]; then
+                status="Done"                                           # S8
+              else
+                status="Backlog"                                        # S7
+              fi ;;
+          esac
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+      - name: Move card and linked issues
+        if: steps.target.outputs.status != ''
+        env:
+          GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::warning::PROJECT_TOKEN not configured — skipping board update."
+            exit 0
+          fi
+          bash .github/scripts/board-sync.sh \
+            "${{ steps.target.outputs.status }}" \
+            "${{ github.event.pull_request.node_id }}" \
+            "${{ github.repository_owner }}" \
+            "${{ github.event.repository.name }}" \
+            "${{ github.event.pull_request.number }}"
+
+  review:
+    name: Review events
+    # S5 — requested changes send the card back to the author
+    if: github.event_name == 'pull_request_review' && github.event.review.state == 'changes_requested'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - env:
+          GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::warning::PROJECT_TOKEN not configured — skipping board update."
+            exit 0
+          fi
+          bash .github/scripts/board-sync.sh "In Progress" \
+            "${{ github.event.pull_request.node_id }}" \
+            "${{ github.repository_owner }}" \
+            "${{ github.event.repository.name }}" \
+            "${{ github.event.pull_request.number }}"
+
+  deployment_sweep:
+    name: Deployment sweep
+    if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Sweep board for the deployed environment
+        env:
+          GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
+          BRANCH: ${{ github.event.workflow_run.head_branch }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::warning::PROJECT_TOKEN not configured — skipping board update."
+            exit 0
+          fi
+          case "$BRANCH" in
+            dev|main|prod) bash .github/scripts/board-sweep.sh "In Review" "Done" ;;
+            *)             echo "No sweep configured for branch '$BRANCH'." ;;
+          esac

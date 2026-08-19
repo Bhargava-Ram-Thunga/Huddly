@@ -1,0 +1,5 @@
+# Gitleaks ignore list
+# Format: <commit-sha>:<file-path>:<rule-id>:<line-number>
+
+# False positive: unit test mock placeholder string in commit f2dfcbd (sanitized at source in subsequent commits)
+f2dfcbd13373019698b2f9afed51364a91b75d84:packages/config/src/env.test.ts:generic-api-key:30

@@ -72,3 +72,29 @@ jobs:
               ;;
           esac
           echo "Merge target is valid."
+
+  no-ai-attribution:
+    name: No AI attribution
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Reject AI co-author trailers and authors
+        env:
+          BASE: ${{ github.event.pull_request.base.ref }}
+        run: |
+          range="origin/$BASE..HEAD"
+          pattern='(claude|copilot|cursor|anthropic|openai|gemini|antigravity|codeium|devin)'
+
+          if git log "$range" --format='%B' | grep -iE "co-authored-by:.*$pattern"; then
+            echo "::error::Commits contain an AI Co-Authored-By trailer. Remove it (see docs/process/next-session.md rule 6) and amend or rebase."
+            exit 1
+          fi
+
+          if git log "$range" --format='%an <%ae>' | grep -iE "$pattern"; then
+            echo "::error::A commit is authored by an AI account. Commits must be authored by the human maintainer."
+            exit 1
+          fi
+
+          echo "No AI attribution found in $(git rev-list --count "$range") commit(s)."

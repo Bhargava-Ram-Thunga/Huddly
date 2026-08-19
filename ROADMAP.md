@@ -1,6 +1,6 @@
 # Huddly Roadmap
 
-> **Huddly is an open-source realtime layer for being together on the web.**
+> **Huddly is a realtime layer for being together on the web.**
 > It synchronizes the experience, not the screen.
 
 This roadmap turns the master specification into an ordered, end-to-end execution plan. Each phase has a goal, key deliverables, and an exit gate. Phases map to GitHub milestones (M0–M12).
@@ -9,7 +9,7 @@ This roadmap turns the master specification into an ordered, end-to-end executio
 
 ## Guiding constraints
 
-- **Solo developer first, community later** — modular monolith, one repo, no premature microservices.
+- **Lean foundation** — modular monolith, one repo, no premature microservices.
 - **State, not pixels** — the server distributes playback commands, timestamps, and room state; never the media itself.
 - **Graceful degradation** — DRM/uncontrollable sites degrade to manual sync or (later) fallback modes; never bypass protections.
 - **Every phase ships something testable.** A feature is done only with tests, error handling, docs, and acceptance criteria met.
@@ -39,13 +39,13 @@ Chrome + Firefox extension, web client, room create/join via link, generic HTML5
 
 ## Phase 1 — Repository Foundation `M1`
 
-**Goal:** a contributor can clone → install → run → test in under 30 minutes.
+**Goal:** clone → install → run → test in under 15 minutes.
 
 - Monorepo scaffold: `apps/` (extension, web), `packages/` (core, protocol, sync-engine, site-adapters, browser-platform, chat, permissions, ui, testing), `services/` (api, realtime), `infrastructure/`, `docs/`.
 - Tooling: pnpm workspaces, Turborepo, TypeScript strict, ESLint, Prettier, commit hooks, conventional commits.
 - CI (GitHub Actions): lint, typecheck, unit tests, build on every PR.
 - Vitest + Playwright harnesses; Docker Compose for Postgres + Redis; env management.
-- Community docs: README, CONTRIBUTING, ARCHITECTURE, SECURITY, CODE_OF_CONDUCT, issue/PR templates.
+- Core documentation: README, ARCHITECTURE, SECURITY.
 
 **Exit gate:** green CI on a trivial end-to-end "hello room" package graph.
 
@@ -163,7 +163,7 @@ Three parallelizable tracks:
 - Self-hosting guide + one-command Docker deployment.
 - Full documentation set (architecture, adapter development, sync protocol, API, WebSocket events, self-hosting, troubleshooting).
 - Landing page ("Be together on the web"), extension store listings, launch.
-- Community: curated good-first-issues per contributor tier, adapter contribution flow with automated validation.
+- Ecosystem: adapter development kit with automated validation.
 
 ---
 
@@ -220,4 +220,4 @@ Implementation + tests + error handling + security consideration + documentation
 
 ## North-star metrics
 
-Activation (create/join success), time-to-first-playback, sync drift (median/p95), reconnect success rate, room stability, chat/voice/video engagement, retention, contributor growth, adapter count.
+Activation (create/join success), time-to-first-playback, sync drift (median/p95), reconnect success rate, room stability, chat/voice/video engagement, retention, adapter count.

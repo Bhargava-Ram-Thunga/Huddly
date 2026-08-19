@@ -1,0 +1,106 @@
+# ADR-005: Redis Architectural Boundaries: Caching, Presence, and Pub/Sub
+
+- **Status:** Accepted
+- **Date:** 2026-08-17
+- **Deciders:** Bhargava-Ram-Thunga
+- **Issue:** [ARCH-007](https://github.com/Bhargava-Ram-Thunga/Huddly/issues/43)
+
+## Context
+
+Huddly's architecture combines durable relational storage (PostgreSQL, ADR-004) with high-frequency, low-latency ephemeral state and cross-node communication (spec §37, MVP §1).
+
+The system requires:
+
+1. **Sub-Millisecond Ephemeral State Access:** Active room presence, room revision counters, and one-time WebSocket connection tickets must be readable and writable with $<2\text{ ms}$ latency.
+2. **Cross-Instance Message Fanout:** When multiple Fastify WebSocket gateway instances serve participants in the same room across different servers, room events must broadcast instantaneously to all nodes.
+3. **Strict Data Boundary Separation:** Ephemeral caching and pub/sub transport must never become an unrecoverable source of truth for durable entities (users, rooms, memberships).
+
+### Options considered
+
+#### 1. Single Database for Both Durable Data & Realtime State (PostgreSQL Only)
+
+- **Mechanism:** Use PostgreSQL with `LISTEN` / `NOTIFY` and unlogged tables for realtime pub/sub and state caching.
+- **Pros:** Single database technology to manage and monitor.
+- **Cons:** High connection churn from WebSocket servers; `LISTEN`/`NOTIFY` queues put heavy load on PostgreSQL WAL buffers and locks under high message volumes; unlogged tables increase disk I/O compared to in-memory key-value engines.
+- **Outcome:** **Rejected.**
+
+#### 2. Redis Split-Boundary Architecture (Dual-Connection Model)
+
+- **Mechanism:** Deploy Redis as an in-memory data plane with strict separation of concerns across two distinct configured Redis connections:
+  - **`REDIS_STATE_URL` (Database Index 1 by default):** Manages ephemeral key-value data, single-use ticket storage, and session caches.
+  - **`REDIS_PUBSUB_URL` (Database Index 0 by default):** Dedicated to Redis Pub/Sub channels for cross-node event distribution.
+- **Pros:**
+  - Dedicated pub/sub connection avoids blocking command queues on standard key-value operations.
+  - Extremely fast in-memory execution ($<1\text{ ms}$) for connection ticket verification and presence tracking.
+  - Ephemeral failure tolerance: If Redis is restarted, all durable room data safely reconstitutes from PostgreSQL.
+- **Cons:** Requires running Redis in deployment topology; multi-node coordination requires careful boundary enforcement.
+- **Outcome:** **Selected.**
+
+---
+
+## Decision
+
+Adopt **Redis** as Huddly's ephemeral state, ticket store, and pub/sub message plane, enforced through strict architectural boundaries:
+
+```text
+┌────────────────────────────────────────────────────────────────────────┐
+│                      Redis Dual-Connection Split                       │
+│                                                                        │
+│   Fastify REST API (`services/api`)                                    │
+│             │                                                          │
+│             │ (Mints 60s ticket)                                       │
+│             ▼                                                          │
+│   ┌───────────────────────────────────┐                                │
+│   │ REDIS_STATE_URL (DB Index 1)      │                                │
+│   │ - ticket:<uuid> (TTL: 60s)        │ ◄── Atomic GETDEL              │
+│   │ - room:<id>:rev                   │                                │
+│   │ - user:<id>:presence              │                                │
+│   └───────────────────────────────────┘                                │
+│                                                                        │
+│   Fastify Realtime Gateway (`services/realtime`)                       │
+│             │                                                          │
+│             │ (Publishes & Subscribes)                                 │
+│             ▼                                                          │
+│   ┌───────────────────────────────────┐                                │
+│   │ REDIS_PUBSUB_URL (DB Index 0)     │                                │
+│   │ - Channel: room:<roomId>          │ ──► Distributed WS Fanout      │
+│   └───────────────────────────────────┘                                │
+└────────────────────────────────────────────────────────────────────────┘
+```
+
+### 1. Dual Connection Architecture in `@huddly/config`
+
+- **`REDIS_STATE_URL`:** Configured independently (defaults to `redis://localhost:6379/1`). Used by `services/api` for ticket issuance and `services/realtime` for ticket verification.
+- **`REDIS_PUBSUB_URL`:** Configured independently (defaults to `redis://localhost:6379/0`). Used exclusively for Redis pub/sub room subscriptions (`room:<roomId>`).
+
+### 2. Pre-Upgrade Ticket Lifetime
+
+- Connection tickets are generated by `POST /api/v1/realtime/ticket` with an explicit **60-second TTL** (`redisState.setex(\`ticket:${ticket}\`, 60, ...)`).
+- Consumed atomically via `GETDEL` upon WebSocket handshake (ADR-006).
+
+### 3. Current Realtime Rate Limiting & Known Multi-Node Gap
+
+- **Current Implementation:** The realtime gateway (`services/realtime/src/gateway.ts`) currently implements an **in-memory per-process Map** rate limiter (25 messages per rolling 1000ms window per socket connection).
+- **Known Limitation:** Because the current rate limiter is process-local, rate limits are enforced per connected socket, not distributed across gateway nodes.
+- **Follow-up Decision:** A distributed Redis sliding-window rate limiter (e.g. via Redis Sorted Sets or Lua scripts) is **deferred to Phase 4 (`M3`)** and will be tracked as a dedicated issue to avoid premature complexity during Phase 0 foundation development.
+
+---
+
+## Consequences
+
+### Positive
+
+- Sub-millisecond connection ticket validation and instant multi-node broadcast fanout.
+- Decoupled pub/sub connection prevents blocking regular cache and ticket lookups.
+- Clear data invariants: PostgreSQL remains the immutable durable store; Redis remains completely disposable and reconstructible.
+
+### Negative / Trade-offs
+
+- Requires managing and monitoring Redis instances in production.
+- Process-local rate limiter leaves a multi-node burst gap until the distributed Redis limiter is implemented in Phase 4.
+
+---
+
+## Revisit When
+
+- Multi-cluster global deployments require distributed Redis clustering (e.g. Redis Sentinel / Redis Cluster) or migration to a distributed streaming broker (e.g. NATS JetStream).

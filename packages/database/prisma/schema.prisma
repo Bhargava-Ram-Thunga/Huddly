@@ -1,0 +1,317 @@
+// Huddly Relational Database Schema v1
+// PostgreSQL 16+ Engine
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  DELETED
+}
+
+enum RoomStatus {
+  ACTIVE
+  INACTIVE
+  CLOSED
+}
+
+enum MemberRole {
+  HOST
+  PARTICIPANT
+}
+
+enum MemberStatus {
+  JOINED
+  LEFT
+  KICKED
+}
+
+enum PlaybackStatus {
+  PLAYING
+  PAUSED
+  BUFFERING
+}
+
+model User {
+  id                 String             @id @default(uuid()) @db.Uuid
+  email              String?            @unique @db.VarChar(255)
+  passwordHash       String?            @map("password_hash") @db.VarChar(255)
+  displayName        String             @map("display_name") @db.VarChar(50)
+  avatarUrl          String?            @map("avatar_url") @db.VarChar(2048)
+  isGuest            Boolean            @default(false) @map("is_guest")
+  status             UserStatus         @default(ACTIVE)
+  createdAt          DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime           @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  // Relations
+  devices            UserDevice[]
+  hostedRooms        Room[]             @relation("HostedRooms")
+  memberships        RoomMember[]
+  createdInvites     RoomInvite[]       @relation("CreatedInvites")
+  chatMessages       ChatMessage[]
+  reactions          MessageReaction[]
+  auditEvents        AuditEvent[]       @relation("UserAuditEvents")
+  controlledPlayback PlaybackState[]
+  navigationStates   NavigationState[]  @relation("UserNavigationStates")
+  moderatedActions   ModerationAction[] @relation("ModeratorActions")
+  targetedActions    ModerationAction[] @relation("TargetModerationActions")
+
+  @@index([isGuest, createdAt])
+  @@map("users")
+}
+
+model UserDevice {
+  id               String       @id @default(uuid()) @db.Uuid
+  userId           String       @map("user_id") @db.Uuid
+  deviceType       String       @map("device_type") @db.VarChar(32)
+  userAgent        String?      @map("user_agent") @db.VarChar(512)
+  pushToken        String?      @map("push_token") @db.VarChar(512)
+  refreshTokenHash String?      @map("refresh_token_hash") @db.VarChar(255)
+  lastSeenAt       DateTime     @default(now()) @map("last_seen_at") @db.Timestamptz(6)
+  createdAt        DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user             User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, lastSeenAt(sort: Desc)])
+  @@index([refreshTokenHash])
+  @@map("user_devices")
+}
+
+model Room {
+  id                String             @id @default(uuid()) @db.Uuid
+  roomCode          String             @unique @map("room_code") @db.VarChar(8)
+  name              String             @db.VarChar(100)
+  hostUserId        String             @map("host_user_id") @db.Uuid
+  status            RoomStatus         @default(ACTIVE)
+  lastActiveAt      DateTime           @default(now()) @map("last_active_at") @db.Timestamptz(6)
+  expiresAt         DateTime?          @map("expires_at") @db.Timestamptz(6)
+  createdAt         DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime           @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  hostUser          User               @relation("HostedRooms", fields: [hostUserId], references: [id], onDelete: Restrict)
+  settings          RoomSettings?
+  permissions       RoomPermission[]
+  members           RoomMember[]
+  invites           RoomInvite[]
+  mediaSessions     MediaSession[]
+  playbackState     PlaybackState?
+  playbackEvents    PlaybackEvent[]
+  navigationStates  NavigationState[]
+  moderationActions ModerationAction[]
+  chatMessages      ChatMessage[]
+  auditEvents       AuditEvent[]
+
+  @@index([hostUserId])
+  @@map("rooms")
+}
+
+model RoomSettings {
+  roomId               String     @id @map("room_id") @db.Uuid
+  maxParticipants      Int        @default(10) @map("max_participants")
+  isLocked             Boolean    @default(false) @map("is_locked")
+  allowGuestChat       Boolean    @default(true) @map("allow_guest_chat")
+  allowGuestVoice      Boolean    @default(true) @map("allow_guest_voice")
+  defaultMemberRole    MemberRole @default(PARTICIPANT) @map("default_member_role")
+  autoCloseOnHostLeave Boolean    @default(false) @map("auto_close_on_host_leave")
+  updatedAt            DateTime   @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  room                 Room       @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@map("room_settings")
+}
+
+model RoomPermission {
+  id                 String     @id @default(uuid()) @db.Uuid
+  roomId             String     @map("room_id") @db.Uuid
+  role               MemberRole
+  canControlPlayback Boolean    @default(false) @map("can_control_playback")
+  canChangeMedia     Boolean    @default(false) @map("can_change_media")
+  canSendChat        Boolean    @default(true) @map("can_send_chat")
+  canSpeak           Boolean    @default(true) @map("can_speak")
+  canInvite          Boolean    @default(true) @map("can_invite")
+  canKick            Boolean    @default(false) @map("can_kick")
+  updatedAt          DateTime   @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  room               Room       @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@unique([roomId, role])
+  @@map("room_permissions")
+}
+
+model RoomMember {
+  id               String       @id @default(uuid()) @db.Uuid
+  roomId           String       @map("room_id") @db.Uuid
+  userId           String       @map("user_id") @db.Uuid
+  role             MemberRole   @default(PARTICIPANT)
+  status           MemberStatus @default(JOINED)
+  joinedAt         DateTime     @default(now()) @map("joined_at") @db.Timestamptz(6)
+  leftAt           DateTime?    @map("left_at") @db.Timestamptz(6)
+
+  room             Room         @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user             User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([roomId, userId])
+  @@map("room_members")
+}
+
+model RoomInvite {
+  id               String       @id @default(uuid()) @db.Uuid
+  roomId           String       @map("room_id") @db.Uuid
+  code             String       @unique @db.VarChar(16)
+  maxUses          Int?         @map("max_uses")
+  usesCount        Int          @default(0) @map("uses_count")
+  expiresAt        DateTime?    @map("expires_at") @db.Timestamptz(6)
+  createdByUserId  String       @map("created_by_user_id") @db.Uuid
+  createdAt        DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  room             Room         @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  createdByUser    User         @relation("CreatedInvites", fields: [createdByUserId], references: [id], onDelete: Cascade)
+
+  @@map("room_invites")
+}
+
+model MediaSession {
+  id               String          @id @default(uuid()) @db.Uuid
+  roomId           String          @map("room_id") @db.Uuid
+  mediaUrl         String          @map("media_url") @db.VarChar(1024)
+  mediaTitle       String?         @map("media_title") @db.VarChar(255)
+  duration         Float?          @db.DoublePrecision
+  sourceType       String          @default("GENERIC_HTML5") @map("source_type") @db.VarChar(50)
+  createdAt        DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  endedAt          DateTime?       @map("ended_at") @db.Timestamptz(6)
+
+  room             Room            @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  playbackStates   PlaybackState[]
+  playbackEvents   PlaybackEvent[]
+
+  @@map("media_sessions")
+}
+
+model PlaybackState {
+  roomId           String         @id @map("room_id") @db.Uuid
+  mediaSessionId   String?        @map("media_session_id") @db.Uuid
+  status           PlaybackStatus @default(PAUSED)
+  position         Float          @default(0.0) @db.DoublePrecision
+  isPlaying        Boolean        @default(false) @map("is_playing")
+  playbackRate     Float          @default(1.0) @map("playback_rate") @db.DoublePrecision
+  revision         BigInt         @default(0)
+  controllerUserId String?        @map("controller_user_id") @db.Uuid
+  serverTimestamp  DateTime       @default(now()) @map("server_timestamp") @db.Timestamptz(6)
+  updatedAt        DateTime       @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  room             Room           @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  mediaSession     MediaSession?  @relation(fields: [mediaSessionId], references: [id], onDelete: SetNull)
+  controller       User?          @relation(fields: [controllerUserId], references: [id], onDelete: SetNull)
+
+  @@index([controllerUserId])
+  @@map("playback_states")
+}
+
+model PlaybackEvent {
+  id               String        @id @default(uuid()) @db.Uuid
+  roomId           String        @map("room_id") @db.Uuid
+  mediaSessionId   String?       @map("media_session_id") @db.Uuid
+  actorUserId      String?       @map("actor_user_id") @db.Uuid
+  eventType        String        @map("event_type") @db.VarChar(64)
+  revision         BigInt
+  position         Float         @db.DoublePrecision
+  playbackRate     Float         @map("playback_rate") @db.DoublePrecision
+  serverTimestamp  DateTime      @default(now()) @map("server_timestamp") @db.Timestamptz(6)
+  payload          Json?         @default("{}")
+  createdAt        DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  room             Room          @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  mediaSession     MediaSession? @relation(fields: [mediaSessionId], references: [id], onDelete: SetNull)
+
+  @@index([roomId, revision(sort: Desc)])
+  @@index([serverTimestamp])
+  @@map("playback_events")
+}
+
+model NavigationState {
+  id               String       @id @default(uuid()) @db.Uuid
+  roomId           String       @map("room_id") @db.Uuid
+  actorUserId      String?      @map("actor_user_id") @db.Uuid
+  url              String       @db.VarChar(2048)
+  pageTitle        String?      @map("page_title") @db.VarChar(255)
+  revision         BigInt
+  serverTimestamp  DateTime     @default(now()) @map("server_timestamp") @db.Timestamptz(6)
+  createdAt        DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  room             Room         @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  actor            User?        @relation("UserNavigationStates", fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([roomId, revision(sort: Desc)])
+  @@index([serverTimestamp])
+  @@map("navigation_states")
+}
+
+model ModerationAction {
+  id              String    @id @default(uuid()) @db.Uuid
+  roomId          String    @map("room_id") @db.Uuid
+  moderatorUserId String?   @map("moderator_user_id") @db.Uuid
+  targetUserId    String?   @map("target_user_id") @db.Uuid
+  actionType      String    @map("action_type") @db.VarChar(32)
+  reason          String?   @db.Text
+  expiresAt       DateTime? @map("expires_at") @db.Timestamptz(6)
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  room            Room      @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  moderatorUser   User?     @relation("ModeratorActions", fields: [moderatorUserId], references: [id], onDelete: SetNull)
+  targetUser      User?     @relation("TargetModerationActions", fields: [targetUserId], references: [id], onDelete: SetNull)
+
+  @@index([roomId, targetUserId, actionType])
+  @@index([createdAt])
+  @@map("moderation_actions")
+}
+
+model ChatMessage {
+  id               String       @id @default(uuid()) @db.Uuid
+  roomId           String       @map("room_id") @db.Uuid
+  userId           String       @map("user_id") @db.Uuid
+  content          String       @db.Text
+  isSystem         Boolean      @default(false) @map("is_system")
+  isDeleted        Boolean      @default(false) @map("is_deleted")
+  createdAt        DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  room             Room         @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user             User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reactions        MessageReaction[]
+
+  @@map("chat_messages")
+}
+
+model MessageReaction {
+  id               String       @id @default(uuid()) @db.Uuid
+  messageId        String       @map("message_id") @db.Uuid
+  userId           String       @map("user_id") @db.Uuid
+  emoji            String       @db.VarChar(16)
+  createdAt        DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  message          ChatMessage  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user             User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId, emoji])
+  @@map("message_reactions")
+}
+
+model AuditEvent {
+  id               String       @id @default(uuid()) @db.Uuid
+  roomId           String?      @map("room_id") @db.Uuid
+  actorUserId      String?      @map("actor_user_id") @db.Uuid
+  eventType        String       @map("event_type") @db.VarChar(50)
+  details          Json         @default("{}")
+  createdAt        DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  room             Room?        @relation(fields: [roomId], references: [id], onDelete: SetNull)
+  actorUser        User?        @relation("UserAuditEvents", fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@map("audit_events")
+}

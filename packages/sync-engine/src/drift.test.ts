@@ -137,4 +137,20 @@ describe('decideCorrection', () => {
     expect(decision.action).toBe('hard-seek');
     expect(decision.seekTo).toBeCloseTo(2701, 6);
   });
+
+  it('clamps corrected rate to maximum 4.0 when nudging upward at max rate', () => {
+    // Room rate is 4.0, client is 100ms behind expected position (100 + 5 * 4 = 120)
+    // Raw nudge would be 4.0 * 1.05 = 4.2, which must be clamped to 4.0.
+    const decision = decideCorrection(119.9, state({ playbackRate: 4.0 }), T0 + 5000);
+    expect(decision.action).toBe('nudge-rate');
+    expect(decision.correctedRate).toBe(4.0);
+  });
+
+  it('clamps corrected rate to minimum 0.25 when nudging downward at min rate', () => {
+    // Room rate is 0.25, client is 100ms ahead of expected position (100 + 4 * 0.25 = 101)
+    // Raw nudge would be 0.25 * 0.95 = 0.2375, which must be clamped to 0.25.
+    const decision = decideCorrection(101.1, state({ playbackRate: 0.25 }), T0 + 4000);
+    expect(decision.action).toBe('nudge-rate');
+    expect(decision.correctedRate).toBe(0.25);
+  });
 });

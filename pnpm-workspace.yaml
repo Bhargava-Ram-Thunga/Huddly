@@ -3,6 +3,10 @@ packages:
   - 'packages/*'
   - 'services/*'
 
-# esbuild ships prebuilt binaries and needs its install script to run (used by Vitest).
+# Allow build scripts for essential tools
 allowBuilds:
   esbuild: true
+  prisma: true
+  '@prisma/client': true
+  argon2: true
+  '@prisma/engines': true

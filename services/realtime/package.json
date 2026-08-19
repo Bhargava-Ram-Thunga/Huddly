@@ -1,0 +1,33 @@
+{
+  "name": "@huddly/realtime",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/gateway.js",
+  "types": "./dist/gateway.d.ts",
+  "scripts": {
+    "dev": "tsx watch src/gateway.ts",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "start": "node dist/gateway.js",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@fastify/websocket": "^11.0.2",
+    "@huddly/config": "workspace:*",
+    "@huddly/database": "workspace:*",
+    "@huddly/protocol": "workspace:*",
+    "@huddly/sync-engine": "workspace:*",
+    "fastify": "^5.2.1",
+    "ioredis": "^5.5.0",
+    "ws": "^8.18.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "@types/ws": "^8.5.14",
+    "tsx": "^4.19.3"
+  }
+}

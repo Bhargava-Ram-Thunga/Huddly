@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" fill="none">
+  <defs>
+    <filter id="pop-shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#4D3119" flood-opacity="0.15" />
+    </filter>
+    <linearGradient id="butter-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFE885" />
+      <stop offset="45%" stop-color="#F2BB31" />
+      <stop offset="100%" stop-color="#E5A61C" />
+    </linearGradient>
+    <linearGradient id="cream-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#FAF3E4" />
+    </linearGradient>
+  </defs>
+
+  <g filter="url(#pop-shadow)">
+    <!-- Kernel 1 (Top Left) -->
+    <g class="kernel-top-left">
+      <!-- Shadow / Caramel base -->
+      <circle cx="36" cy="30" r="15" fill="#BF7118" opacity="0.25" />
+      <path d="M34 29 C32 33, 38 37, 40 33 C42 29, 36 27, 34 29 Z" fill="#4D3119" opacity="0.6" />
+      <!-- Fluffy Butter Puffs -->
+      <circle cx="27" cy="22" r="11" fill="url(#butter-grad)" />
+      <circle cx="45" cy="21" r="12" fill="url(#butter-grad)" />
+      <circle cx="47" cy="37" r="11" fill="url(#butter-grad)" />
+      <circle cx="28" cy="37" r="10" fill="url(#butter-grad)" />
+      <circle cx="37" cy="28" r="13" fill="url(#butter-grad)" />
+      <!-- Cream Highlights -->
+      <circle cx="26" cy="20" r="6" fill="url(#cream-grad)" opacity="0.9" />
+      <circle cx="44" cy="19" r="7" fill="url(#cream-grad)" opacity="0.9" />
+      <circle cx="37" cy="26" r="6.5" fill="url(#cream-grad)" opacity="0.95" />
+      <!-- Popcorn Seed Hull Accent -->
+      <circle cx="36" cy="31" r="3.5" fill="#BF7118" />
+    </g>
+
+    <!-- Kernel 2 (Bottom Left) -->
+    <g class="kernel-bottom-left">
+      <!-- Shadow / Caramel base -->
+      <circle cx="36" cy="98" r="15" fill="#BF7118" opacity="0.25" />
+      <path d="M34 97 C32 101, 38 105, 40 101 C42 97, 36 95, 34 97 Z" fill="#4D3119" opacity="0.6" />
+      <!-- Fluffy Butter Puffs -->
+      <circle cx="27" cy="90" r="11" fill="url(#butter-grad)" />
+      <circle cx="45" cy="91" r="12" fill="url(#butter-grad)" />
+      <circle cx="47" cy="107" r="11" fill="url(#butter-grad)" />
+      <circle cx="28" cy="107" r="10" fill="url(#butter-grad)" />
+      <circle cx="37" cy="100" r="13" fill="url(#butter-grad)" />
+      <!-- Cream Highlights -->
+      <circle cx="26" cy="88" r="6" fill="url(#cream-grad)" opacity="0.9" />
+      <circle cx="44" cy="89" r="7" fill="url(#cream-grad)" opacity="0.9" />
+      <circle cx="37" cy="98" r="6.5" fill="url(#cream-grad)" opacity="0.95" />
+      <!-- Popcorn Seed Hull Accent -->
+      <circle cx="36" cy="101" r="3.5" fill="#BF7118" />
+    </g>
+
+    <!-- Kernel 3 (Right Apex) -->
+    <g class="kernel-right-apex">
+      <!-- Shadow / Caramel base -->
+      <circle cx="98" cy="64" r="15" fill="#BF7118" opacity="0.25" />
+      <path d="M96 63 C94 67, 100 71, 102 67 C104 63, 98 61, 96 63 Z" fill="#4D3119" opacity="0.6" />
+      <!-- Fluffy Butter Puffs -->
+      <circle cx="89" cy="55" r="11" fill="url(#butter-grad)" />
+      <circle cx="107" cy="57" r="12" fill="url(#butter-grad)" />
+      <circle cx="109" cy="73" r="11" fill="url(#butter-grad)" />
+      <circle cx="90" cy="73" r="10" fill="url(#butter-grad)" />
+      <circle cx="100" cy="64" r="13" fill="url(#butter-grad)" />
+      <!-- Cream Highlights -->
+      <circle cx="88" cy="53" r="6" fill="url(#cream-grad)" opacity="0.9" />
+      <circle cx="106" cy="55" r="7" fill="url(#cream-grad)" opacity="0.9" />
+      <circle cx="99" cy="62" r="6.5" fill="url(#cream-grad)" opacity="0.95" />
+      <!-- Popcorn Seed Hull Accent -->
+      <circle cx="98" cy="65" r="3.5" fill="#BF7118" />
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 96" width="360" height="96" fill="none">
+  <defs>
+    <filter id="lockup-shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#4D3119" flood-opacity="0.15" />
+    </filter>
+    <linearGradient id="lockup-butter-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFE885" />
+      <stop offset="45%" stop-color="#F2BB31" />
+      <stop offset="100%" stop-color="#E5A61C" />
+    </linearGradient>
+    <linearGradient id="lockup-cream-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#FAF3E4" />
+    </linearGradient>
+  </defs>
+
+  <!-- Scaled Logo Mark (0.625 Scale -> 80x80) -->
+  <g transform="translate(16, 8) scale(0.625)" filter="url(#lockup-shadow)">
+    <!-- Kernel 1 -->
+    <g>
+      <circle cx="36" cy="30" r="15" fill="#BF7118" opacity="0.25" />
+      <circle cx="27" cy="22" r="11" fill="url(#lockup-butter-grad)" />
+      <circle cx="45" cy="21" r="12" fill="url(#lockup-butter-grad)" />
+      <circle cx="47" cy="37" r="11" fill="url(#lockup-butter-grad)" />
+      <circle cx="28" cy="37" r="10" fill="url(#lockup-butter-grad)" />
+      <circle cx="37" cy="28" r="13" fill="url(#lockup-butter-grad)" />
+      <circle cx="26" cy="20" r="6" fill="url(#lockup-cream-grad)" opacity="0.9" />
+      <circle cx="44" cy="19" r="7" fill="url(#lockup-cream-grad)" opacity="0.9" />
+      <circle cx="37" cy="26" r="6.5" fill="url(#lockup-cream-grad)" opacity="0.95" />
+      <circle cx="36" cy="31" r="3.5" fill="#BF7118" />
+    </g>
+    <!-- Kernel 2 -->
+    <g>
+      <circle cx="36" cy="98" r="15" fill="#BF7118" opacity="0.25" />
+      <circle cx="27" cy="90" r="11" fill="url(#lockup-butter-grad)" />
+      <circle cx="45" cy="91" r="12" fill="url(#lockup-butter-grad)" />
+      <circle cx="47" cy="107" r="11" fill="url(#lockup-butter-grad)" />
+      <circle cx="28" cy="107" r="10" fill="url(#lockup-butter-grad)" />
+      <circle cx="37" cy="100" r="13" fill="url(#lockup-butter-grad)" />
+      <circle cx="26" cy="88" r="6" fill="url(#lockup-cream-grad)" opacity="0.9" />
+      <circle cx="44" cy="89" r="7" fill="url(#lockup-cream-grad)" opacity="0.9" />
+      <circle cx="37" cy="98" r="6.5" fill="url(#lockup-cream-grad)" opacity="0.95" />
+      <circle cx="36" cy="101" r="3.5" fill="#BF7118" />
+    </g>
+    <!-- Kernel 3 -->
+    <g>
+      <circle cx="98" cy="64" r="15" fill="#BF7118" opacity="0.25" />
+      <circle cx="89" cy="55" r="11" fill="url(#lockup-butter-grad)" />
+      <circle cx="107" cy="57" r="12" fill="url(#lockup-butter-grad)" />
+      <circle cx="109" cy="73" r="11" fill="url(#lockup-butter-grad)" />
+      <circle cx="90" cy="73" r="10" fill="url(#lockup-butter-grad)" />
+      <circle cx="100" cy="64" r="13" fill="url(#lockup-butter-grad)" />
+      <circle cx="88" cy="53" r="6" fill="url(#lockup-cream-grad)" opacity="0.9" />
+      <circle cx="106" cy="55" r="7" fill="url(#lockup-cream-grad)" opacity="0.9" />
+      <circle cx="99" cy="62" r="6.5" fill="url(#lockup-cream-grad)" opacity="0.95" />
+      <circle cx="98" cy="65" r="3.5" fill="#BF7118" />
+    </g>
+  </g>
+
+  <!-- Wordmark "Huddly" -->
+  <text x="112" y="60" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="44" font-weight="800" letter-spacing="-0.03em" fill="#131A2A">
+    Huddly
+  </text>
+  <!-- Accent Dot -->
+  <circle cx="272" cy="54" r="4.5" fill="#F2BB31" />
+</svg>
