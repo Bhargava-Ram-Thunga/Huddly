@@ -26,8 +26,8 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@types/node": "^26.2.0",
+    "@types/node": "^26.6.2",
     "@types/ws": "^8.5.14",
-    "tsx": "^4.19.3"
+    "tsx": "^4.23.15"
   }
 }
